@@ -1,0 +1,541 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+}
+
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(to right, #dbeafe, #eff6ff); /* warna lembut */
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding-inline: 32px;
+  margin-inline: auto;
+  max-width: 1300px;
+}
+
+header {
+  background-color: #3f7d59
+}
+
+.nav-list a {
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-list a:hover {
+  color: #b7e4c7;
+}
+
+.main-header {
+  min-height: 90px;
+  padding-block: 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.brand-name {
+  font-size: 1.125rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: #ffff;
+}
+
+.navigation-drawer {
+  min-height: 100vh;
+  width: 200px;
+  padding: 20px 10px;
+  background-color: #fff;
+
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+
+  box-shadow: 0 0 4px 2px #00000033;
+  transform: translateX(-100%);
+  transition: transform 350ms;
+
+  z-index: 9999;
+}
+
+.navigation-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-button {
+  padding: 8px;
+  border: 0;
+  border-radius: 4px;
+
+  display: inline-block;
+  background-color: transparent;
+
+  font-weight: bold;
+  font-size: 28px;
+  color: #141e16;
+
+  cursor: pointer;
+}
+
+.nav-list {
+  list-style: none;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px 20px;
+}
+
+.nav-list li a {
+  padding: 6px 10px;
+
+  display: block;
+  
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-list li a:hover {
+  text-decoration: underline;
+}
+
+/* MAIN */
+.main-content {
+  padding-block: 20px;
+}
+
+/* Register  */
+/* Tambahkan ini di file CSS utama atau import di halaman register */
+.register {
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.register h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1e3a8a;
+}
+
+.register form input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.register form input:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.register button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.register button:hover {
+  background-color: #1e3a8a;
+}
+
+.register p {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.register a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+#registerMessage {
+  margin-top: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+
+/* Login  Start */
+
+.login {
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #1e3a8a;
+}
+
+.login form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login input {
+  padding: 12px;
+  width: 100%;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.login input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.login button {
+  padding: 12px;
+  background-color: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.login button:hover {
+   background-color: #1e3a8a;
+}
+
+.login p {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.login a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+#loginMessage {
+  text-align: center;
+  margin-top: 16px;
+  font-weight: 500;
+}
+
+/* Login End */
+
+/* HOme Page  */
+.stories {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.stories h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 28px;
+  color: #333;
+}
+
+#logoutButton {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  float: right;
+  margin-bottom: 16px;
+}
+
+#logoutButton:hover {
+  background-color: #d32f2f;
+}
+
+#addStoryButton {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+#addStoryButton:hover {
+  background-color: #4338ca;
+}
+
+#storyList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.story-card {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.story-card:hover {
+  transform: translateY(-4px);
+}
+
+.story-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.story-card h3 {
+  font-size: 18px;
+  margin: 12px 16px 8px;
+  color: #111827;
+}
+
+.story-card p {
+  font-size: 14px;
+  color: #374151;
+  margin: 0 16px 8px;
+}
+
+.story-card small {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 16px 12px;
+}
+
+#map {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Home Page End */
+
+/* Add Story */
+/* Form Tambah Cerita */
+section {
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #2d3748;
+  text-align: center;
+}
+
+form label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+form input[type="text"],
+form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+form textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+#video,
+#preview,
+#canvas {
+  display: block;
+  margin: 0 auto 1rem auto;
+  border-radius: 8px;
+}
+
+#map {
+  margin-top: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+}
+
+form button {
+  background-color: #38bdf8;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block;
+  margin: 1rem auto;
+}
+
+form button:hover {
+  background-color: #0ea5e9;
+}
+
+/* Tombol kamera */
+#capture {
+  background-color: #16a34a;
+  margin-bottom: 1rem;
+}
+
+#capture:hover {
+  background-color: #15803d;
+}
+
+/* Add Story End */
+
+/* Accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #000;
+  color: #fff;
+  padding: 8px 16px;
+  z-index: 1000;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+input,
+textarea,
+button {
+  font-family: inherit;
+  font-size: 1rem;
+}
+/* Accessibility End */
+
+/* Write your styles more here */
+
+@media screen and (width > 1000px) {
+  .navigation-drawer {
+    min-height: auto;
+    width: auto;
+    padding: 0;
+    background-color: transparent;
+
+    flex-direction: row;
+    justify-content: space-between;
+
+    position: static;
+    box-shadow: none;
+    transform: translateX(0);
+  }
+
+  .nav-list {
+    flex-direction: row;
+  }
+
+  .nav-list li a {
+    display: inline-block;
+  }
+
+  .drawer-button {
+    display: none;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 300ms;
+  animation-timing-function: ease;
+}
+
+/* General mobile adjustments */
+@media (max-width: 768px) {
+  #navigation-drawer {
+    position: fixed;
+    width: 70%;
+    height: 100%;
+    top: 0;
+    left: -70%; /* disembunyikan dulu */
+    background-color: #fff;
+    transition: left 0.3s ease;
+  }
+
+  #navigation-drawer.open {
+    left: 0; /* Muncul */
+  }
+
+  nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  header button#drawer-button {
+    font-size: 24px;
+    padding: 8px 12px;
+  }
+}
+
+
+#subscribeButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+#subscribeButton:hover {
+  background-color: #0056b3;
+}

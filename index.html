@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#007bff" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link rel="stylesheet" href="./styles/styles.css" />
+    <title>Ceritaku App</title>
+    <script type="module" src="./src/scripts/index.js"></script>
+  </head>
+
+  <body>
+    <!-- Skip to Content untuk aksesibilitas -->
+    <a href="#mainContent" class="skip-link">Lewati ke konten utama</a>
+
+    <header id="header">
+      <div class="main-header container">
+        <a class="brand-name" href="#/">Ceritaku</a>
+        <nav id="navigation-drawer" class="navigation-drawer">
+          <ul class="nav-list">
+            <li><a href="#/">Beranda</a></li>
+            <li><a href="#/about">Tentang</a></li>
+            <li><button id="logoutButton" class="logout-btn">Logout</button></li>
+          </ul>
+        </nav>
+        <button id="drawer-button" class="drawer-button" aria-label="Buka navigasi">☰</button>
+      </div>
+    </header>
+
+    <main id="mainContent" class="main-content" tabindex="-1"></main>
+  </body>
+</html>

@@ -3,12 +3,13 @@ import SubscribeButton from "../componen/subscribe";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import Swal from "sweetalert2";
-import { deleteStory as deleteFromDB, getAllStories } from "../../data/db.js";
+import StoriesDb from "../../data/db-helper.js"; 
 
 const HomePage = {
   map: null,
 
   async render() {
+
     return `
       <section class="stories">
         <h2>Daftar Cerita</h2>
@@ -21,6 +22,7 @@ const HomePage = {
   },
 
   async afterRender() {
+  
     this.initMap();
     await StoryPresenter.init(this);
 
@@ -45,19 +47,44 @@ const HomePage = {
 
   renderStories(stories) {
     const container = document.querySelector("#storyList");
+    if (!stories || stories.length === 0) {
+      container.innerHTML = "<p>Belum ada cerita. Tambahkan ceritamu!</p>";
+      return;
+    }
+
     container.innerHTML = stories
-      .map(
-        (story) => `
-      <div class="story-card" data-id="${story.id}">
-        <img src="${story.photoUrl}" alt="${story.name}" width="100%" />
-        <h3>${story.name}</h3>
-        <p>${story.description}</p>
-        <small>${story.createdAt}</small>
-        <button class="delete-button" data-id="${story.id}">Hapus</button>
-      </div>
-    `
-      )
+
+      .map((story, index) => {
+        try {
+          const imageUrl = story.photoUrl
+            ? story.photoUrl
+            : URL.createObjectURL(story.photo);
+
+          const storyDate = new Date(story.createdAt).toLocaleString("id-ID", {
+            dateStyle: "medium",
+            timeStyle: "short",
+          });
+
+          return `
+          <div class="story-card" data-id="${story.id}">
+            <img src="${imageUrl}" alt="${
+            story.name || "Story Image"
+          }" style="width:100%; object-fit: cover;" />
+            <h3>${story.name || "Tanpa Nama"}</h3>
+            <p>${story.description}</p>
+            <small>${storyDate}</small>
+            <button class="delete-button" data-id="${story.id}">Hapus</button>
+          </div>
+        `;
+        } catch (err) {
+          // Sekarang 'index' sudah terdefinisi dan bisa digunakan
+          console.error(`Gagal merender cerita di index ${index}:`, story);
+          console.error("Error yang terjadi adalah:", err);
+          return `<div class="story-card-error">Gagal memuat cerita ini. Periksa console untuk detail.</div>`;
+        }
+      })
       .join("");
+
     this.addDeleteListeners();
   },
 
@@ -66,7 +93,9 @@ const HomePage = {
       if (story.lat && story.lon) {
         const marker = L.marker([story.lat, story.lon]).addTo(this.map);
         marker.bindPopup(
-          `<strong>${story.name}</strong><br>${story.description}`
+          `<strong>${story.name || "Tanpa Nama"}</strong><br>${
+            story.description
+          }`
         );
       }
     });
@@ -77,38 +106,45 @@ const HomePage = {
     buttons.forEach((button) => {
       button.addEventListener("click", async (e) => {
         const storyId = e.target.dataset.id;
-
-        const confirm = await Swal.fire({
+        const confirmResult = await Swal.fire({
           title: "Yakin hapus cerita ini?",
+          text: "Cerita yang dihapus tidak bisa dikembalikan.",
           icon: "warning",
           showCancelButton: true,
           confirmButtonText: "Ya, hapus!",
           cancelButtonText: "Batal",
         });
 
-        if (confirm.isConfirmed) {
+        if (confirmResult.isConfirmed) {
           try {
-            const token = localStorage.getItem("token");
+            await StoriesDb.deleteStory(storyId);
 
-            const response = await fetch(`/api/v1/stories/${storyId}`, {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
+            if (navigator.onLine) {
+              const token = localStorage.getItem("token");
 
-            const result = await response.json();
-            console.log("DELETE response:", result);
-            if (!response.ok) throw new Error(result.message);
+              const response = await fetch(
+                `https://story-api.dicoding.dev/v1/stories/${storyId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
 
-            await deleteFromDB(storyId);
+              const result = await response.json();
+              if (!response.ok) {
+                console.error("Gagal hapus di API:", result.message);
+              }
+            }
 
-            Swal.fire("Berhasil", "Cerita berhasil dihapus", "success");
+            Swal.fire("Berhasil", "Cerita berhasil dihapus.", "success");
 
-            // Refresh tampilan
             await StoryPresenter.init(this);
           } catch (err) {
-            Swal.fire("Gagal", err.message, "error");
+            Swal.fire("Gagal", `Terjadi kesalahan: ${err.message}`, "error");
+
+            await StoryPresenter.init(this);
           }
         }
       });

@@ -1,2 +1,2 @@
 # starter-project-with-vite-rolan
-https://capstoneemolog.netlify.app/#/login
+https://diaryemolog.netlify.app/#/login

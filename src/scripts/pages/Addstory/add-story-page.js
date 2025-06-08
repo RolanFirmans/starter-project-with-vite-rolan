@@ -7,10 +7,10 @@ const AddPage = {
         <h2>Tambahkan Cerita</h2>
         <form id="addStoryForm">
           <label for="name">Nama:</label><br />
-          <input type="text" id="name" required /><br /><br />
+          <input type="text" id="name" name="name" required /><br /><br />
 
           <label for="description">Deskripsi:</label><br />
-          <textarea id="description" required></textarea><br /><br />
+          <textarea id="description" name="description" required></textarea><br /><br />
 
           <label>Ambil Gambar (kamera):</label><br />
           <video id="video" autoplay playsinline width="300" height="225"></video><br />

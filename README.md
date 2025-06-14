@@ -1,2 +1,2 @@
 # starter-project-with-vite-rolan
-https://diaryemolog.netlify.app/#/login
+https://storyd.netlify.app/

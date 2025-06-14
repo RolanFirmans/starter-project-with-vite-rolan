@@ -1,14 +1,13 @@
-// sw.js
-
-const CACHE_NAME = 'app-shell-v2';
+const CACHE_NAME = 'app-shell-v4';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/manifest.json', 
-  '/style.css',     
-  '/index.js', 
+  '/assets/index-CXsxona0.css',     
+  '/assets/index-mPS6Xbai.js', 
+  '/images/logo.png',
+  '/images/walpaper1.jpg', 
   '/favicon.png',
-  '/images/logo.png', 
   
 ];
 
@@ -79,7 +78,7 @@ self.addEventListener('push', (event) => {
   const options = {
     body: notificationData.body || 'Ada sesuatu yang baru untukmu!',
     icon: '/images/logo.png', 
-    badge: '/images/logo.png', 
+    badge: '/images/walpaper1.jpg', 
 
     data: {
       url: notificationData.url || '/', 

@@ -39,41 +39,52 @@ const SubscribeButton = () => {
   };
 
 const subscribe = async () => {
-    const registration = await navigator.serviceWorker.ready;
-    try {
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: convertedVapidKey,
-      });
+  const registration = await navigator.serviceWorker.ready;
+  try {
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: convertedVapidKey,
+    });
 
-      console.log('Berhasil subscribe:', subscription);
+    console.log('Berhasil subscribe:', subscription);
 
-     
-      const token = localStorage.getItem('token');
-      if (!token) {
-        Swal.fire('Gagal', 'Anda harus login untuk berlangganan notifikasi.', 'error');
-        return;
-      }
-      
-      
-      await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(subscription), 
-      });
-      
-      Swal.fire('Berhasil!', 'Kamu berhasil berlangganan notifikasi!', 'success');
-      updateButtonUI(true);
-
-    } catch (err) {
-      console.error('Gagal subscribe:', err);
-      Swal.fire('Gagal', 'Gagal melakukan subscribe. Pastikan izin notifikasi diaktifkan.', 'error');
-      updateButtonUI(false); 
+    const token = localStorage.getItem('token');
+    if (!token) {
+      Swal.fire('Gagal', 'Anda harus login untuk berlangganan notifikasi.', 'error');
+      return;
     }
-  };
+
+    // Format body sesuai yang diinginkan backend
+    const body = {
+      endpoint: subscription.endpoint,
+      keys: {
+        p256dh: subscription.getKey('p256dh') 
+          ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh'))))
+          : null,
+        auth: subscription.getKey('auth') 
+          ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth'))))
+          : null,
+      }
+    };
+
+    await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` // Tambahkan header authorization
+      },
+      body: JSON.stringify(body),
+    });
+
+    Swal.fire('Berhasil!', 'Kamu berhasil berlangganan notifikasi!', 'success');
+    updateButtonUI(true);
+
+  } catch (err) {
+    console.error('Gagal subscribe:', err);
+    Swal.fire('Gagal', 'Gagal melakukan subscribe. Pastikan izin notifikasi diaktifkan.', 'error');
+    updateButtonUI(false); 
+  }
+};
 
   const unsubscribe = async () => {
     const registration = await navigator.serviceWorker.ready;

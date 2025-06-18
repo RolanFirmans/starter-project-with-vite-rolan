@@ -1,9 +1,9 @@
 import { openDB } from 'idb';
-
+ 
 const DB_NAME = 'story-app-db';
 const STORE_NAME = 'stories';
 const DB_VERSION = 1;
-
+ 
 // Promise untuk membuka database
 const dbPromise = openDB(DB_NAME, DB_VERSION, {
   upgrade(db) {
@@ -13,7 +13,7 @@ const dbPromise = openDB(DB_NAME, DB_VERSION, {
     }
   },
 });
-
+ 
 // Object helper untuk operasi CRUD ke IndexedDB
 const StoriesDb = {
   /**
@@ -23,14 +23,14 @@ const StoriesDb = {
   async getStory(id) {
     return (await dbPromise).get(STORE_NAME, id);
   },
-
+ 
   /**
    * Mengambil semua cerita dari database.
    */
   async getAllStories() {
     return (await dbPromise).getAll(STORE_NAME);
   },
-
+ 
   /**
    * Menambah atau memperbarui satu cerita.
    * @param {object} story - Objek cerita.
@@ -51,7 +51,7 @@ const StoriesDb = {
     await Promise.all(stories.map(story => store.put(story)));
     return tx.done;
   },
-
+ 
   /**
    * Menghapus satu cerita berdasarkan ID.
    * @param {string} id - ID cerita.
@@ -60,5 +60,5 @@ const StoriesDb = {
     return (await dbPromise).delete(STORE_NAME, id);
   },
 };
-
+ 
 export default StoriesDb;

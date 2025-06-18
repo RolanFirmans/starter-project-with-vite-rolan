@@ -1,39 +1,19 @@
+// File: src/scripts/utils/index.js
 
-export function showFormattedDate(date, locale = 'en-US', options = {}) {
-  return new Date(date).toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    ...options,
-  });
-}
+// Fungsi ini adalah satu-satunya yang perlu kita ekspor dari file ini.
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
 
-export function sleep(time = 1000) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
 
-export function isServiceWorkerAvailable() {
-  return 'serviceWorker' in navigator;
-}
-
-export async function registerServiceWorker() {
-  if (!isServiceWorkerAvailable()) {
-    console.log('Service worker API unsupported.');
-    return;
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
   }
-
-  window.addEventListener('load', async () => {
-    try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service worker registered successfully:', registration);
-
-      if ('Notification' in window && Notification.permission !== 'granted') {
-        Notification.requestPermission();
-      }
-
-    } catch (error) {
-      console.error('Service worker registration failed:', error);
-    }
-  });
+  return outputArray;
 }
 
+export default urlBase64ToUint8Array;

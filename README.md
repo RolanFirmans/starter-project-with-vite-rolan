@@ -1,2 +1,2 @@
 # starter-project-with-vite-rolan
-https://storyd.netlify.app/
+https://storye.netlify.app/

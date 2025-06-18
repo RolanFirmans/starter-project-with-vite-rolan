@@ -3,35 +3,31 @@ import "../styles/styles.css";
 
 import App from "./pages/app";
 import Camera from "./utils/camera.js";
-import { registerServiceWorker } from "./utils/index.js";
 
+// Inisialisasi Aplikasi (sudah benar)
 const app = new App({
   navigationDrawer: document.querySelector("#navigation-drawer"),
   drawerButton: document.querySelector("#drawer-button"),
   content: document.querySelector("#mainContent"),
 });
 
+
+// 1. Render halaman saat pertama kali aplikasi dimuat
+window.addEventListener("load", () => {
+  app.renderPage();
+});
+
+// 2. Render halaman ulang saat URL hash berubah (navigasi)
+window.addEventListener("hashchange", () => {
+  app.renderPage();
+  Camera.stopAllStreams(); // Logika stop kamera bisa digabung di sini
+});
+
+
+
+
+
 const token = localStorage.getItem("token");
-
-document.addEventListener("DOMContentLoaded", async () => {
-  // Redirect kalau belum login
-  if (!token && location.hash !== "#/login") {
-    location.hash = "#/login";
-  } else {
-    await app.renderPage();
-  }
-
-  // Register service worker hanya sekali di sini
-  await registerServiceWorker();
-});
-
-// Tangani perubahan hash (pindah halaman)
-window.addEventListener("hashchange", async () => {
-  await app.renderPage();
-
-  // Saat berpindah halaman, hentikan semua stream kamera
-  Camera.stopAllStreams();
-});
 
 // Kirim ulang data register yang tertunda ketika online
 window.addEventListener("online", () => {

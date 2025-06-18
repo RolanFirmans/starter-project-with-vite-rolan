@@ -1,32 +1,34 @@
-const CACHE_NAME = 'app-shell-v4';
+// public/sw.js - KODE FINAL
+const CACHE_NAME = 'story-app-cache-v12'; // Versi dinaikkan untuk memicu update
+// sw.js - CONTOH UNTUK DEVELOPMENT
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json', 
-  '/assets/index-CXsxona0.css',     
-  '/assets/index-mPS6Xbai.js', 
-  '/images/logo.png',
-  '/images/walpaper1.jpg', 
-  '/favicon.png',
+    '/', // Ini mewakili index.html di root
+    '/index.html',
+    '/manifest.json',
+    '/favicon.png',
+    '/assets/index-wALjkHrL.js',   
+    '/assets/index-BKpaSXvd.css',  
+    '/icons/icon-144x144.png',  
+    '/icons/icon-512x512.png',     
   
 ];
 
-
+// Listener 'install': Caching app shell
 self.addEventListener('install', event => {
-  console.log('Service Worker: Install');
+  console.log('Service Worker: Install v2');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Service Worker: Caching App Shell');
         return cache.addAll(ASSETS_TO_CACHE);
       })
-      .then(() => self.skipWaiting()) 
+      .then(() => self.skipWaiting())
   );
 });
 
-
+// Listener 'activate': Membersihkan cache lama
 self.addEventListener('activate', event => {
-  console.log('Service Worker: Activate');
+  console.log('Service Worker: Activate v2');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -37,75 +39,107 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(() => self.clients.claim()) 
+    }).then(() => self.clients.claim())
   );
 });
 
+// Listener 'fetch': (Tetap sama, sudah bagus)
+// public/sw.js - PERBAIKAN UNTUK FETCH LISTENER
 
-self.addEventListener('fetch', event => {
-  console.log('Service Worker: Fetching', event.request.url);
-  
-  event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
+// Di dalam file sw.js
+
+// ... (di dalam event listener 'fetch') ...
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Strategi untuk API call (sudah ada)
+  if (url.origin === 'https://story-api.dicoding.dev' && url.pathname.startsWith('/v1/stories')) {
+    // ... logika Network-First Anda untuk data JSON ...
+    return;
+  }
+
+  // === TAMBAHKAN BLOK 'ELSE IF' DI BAWAH INI ===
+  // Strategi Cache-First untuk gambar cerita dari API
+  else if (url.origin === 'https://story-api.dicoding.dev' && url.pathname.startsWith('/images/stories/')) {
+    event.respondWith(
+      caches.match(request).then(cachedResponse => {
         if (cachedResponse) {
-          console.log('Returning from cache:', event.request.url);
-          return cachedResponse;
+          return cachedResponse; // Jika ada di cache, langsung kembalikan
         }
-        console.log('Fetching from network:', event.request.url);
-        return fetch(event.request).then(networkResponse => {
-         
-          return networkResponse;
-        });
-      }).catch(error => {
-        console.error('Service Worker: Fetch failed; returning offline fallback.', error);
-       
-        return new Response('Anda sedang offline. Beberapa konten mungkin tidak tersedia.', {
-          status: 404,
-          statusText: 'Offline',
-          headers: {'Content-Type': 'text/plain'}
+
+        // Jika tidak ada, fetch dari network
+        return fetch(request).then(networkResponse => {
+          return caches.open('dynamic-images-cache').then(cache => { // Gunakan cache terpisah untuk gambar
+            cache.put(request, networkResponse.clone());
+            return networkResponse;
+          });
         });
       })
+    );
+    return;
+  }
+  // === AKHIR BAGIAN TAMBAHAN ===
+
+  // Strategi untuk Aset Lokal (App Shell)
+  event.respondWith(
+    caches.match(request).then(cachedResponse => {
+      return cachedResponse || fetch(request);
+    })
+  );
+});
+
+  
+
+
+// Listener 'push': Menangani notifikasi masuk (VERSI DENGAN DEBUGGING)
+self.addEventListener('push', event => {
+  console.log('Service Worker: Push Received.');
+  console.log('--> Push event data mentah:', event.data);
+
+  let data;
+  try {
+    data = event.data.json();
+  } catch (error) {
+    console.log('--> Gagal parse JSON, mencoba sebagai teks.');
+    data = {
+      title: 'Notifikasi Baru',
+      body: event.data.text(),
+      url: '/'
+    };
+  }
+
+  const options = {
+    body: data.body,
+    icon: '/images/badge.png',
+    data: {
+      url: data.url || '/'
+    }
+  };
+
+  console.log('--> Mencoba menampilkan notifikasi dengan judul:', data.title);
+  console.log('--> Dan dengan options:', options);
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
   );
 });
 
 
-self.addEventListener('push', (event) => {
-  console.log('Push event received:', event);
-
-  const notificationData = event.data.json(); 
-  const title = notificationData.title || 'Notifikasi Baru';
-  const options = {
-    body: notificationData.body || 'Ada sesuatu yang baru untukmu!',
-    icon: '/images/logo.png', 
-    badge: '/images/walpaper1.jpg', 
-
-    data: {
-      url: notificationData.url || '/', 
-    },
-  };
-
- 
-  event.waitUntil(self.registration.showNotification(title, options));
-});
-
+// Listener 'notificationclick': (Tetap sama, sudah bagus)
 self.addEventListener('notificationclick', (event) => {
- 
+  console.log('Service Worker: Notification clicked.');
   event.notification.close();
-
-
   const urlToOpen = event.notification.data.url;
-  
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then((windowClients) => {
-      
       for (let i = 0; i < windowClients.length; i++) {
         const client = windowClients[i];
         if (client.url === urlToOpen && 'focus' in client) {
           return client.focus();
         }
       }
-      
       if (clients.openWindow) {
         return clients.openWindow(urlToOpen);
       }

@@ -1,5 +1,5 @@
 // public/sw.js - KODE FINAL
-const CACHE_NAME = 'story-app-cache-v13'; // Versi dinaikkan untuk memicu update
+const CACHE_NAME = 'story-app-cache-v14'; // Versi dinaikkan untuk memicu update
 // sw.js - CONTOH UNTUK DEVELOPMENT
 const ASSETS_TO_CACHE = [
     '/', // Ini mewakili index.html di root
@@ -18,6 +18,8 @@ const ASSETS_TO_CACHE = [
     '/icons/icon-256x256.png',
     '/icons/icon-384x384.png',
     '/icons/icon-512x512.png',
+    '/marker-icon-2x.png',
+    '/marker-shadow.png',
     
   
 ];

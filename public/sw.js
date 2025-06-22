@@ -7,7 +7,7 @@ const ASSETS_TO_CACHE = [
   "/manifest.json",
   "/favicon.png",
   "/assets/index-CBOXk12m.js",
-  "/assets/index-9KgoDWud.css",
+  "/assets/index-BKpaSXvd.css",
   "/icons/icon-48x48.png",
   "/icons/icon-72x72.png",
   "/icons/icon-96x96.png",

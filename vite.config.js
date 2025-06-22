@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/starter-project-with-vite-rolan/',
+  base: './',
 
   server: {
     proxy: {

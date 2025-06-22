@@ -1,12 +1,12 @@
 // public/sw.js - KODE FINAL
-const CACHE_NAME = "story-app-cache-v21"; // Versi dinaikkan untuk memicu update
+const CACHE_NAME = "story-app-cache-v41"; // Versi dinaikkan untuk memicu update
 // sw.js - CONTOH UNTUK DEVELOPMENT
 const ASSETS_TO_CACHE = [
   "/", // Ini mewakili index.html di root
   "/index.html",
   "/manifest.json",
   "/favicon.png",
-  "/assets/index-wALjkHrL.js",
+  "/assets/index-CBOXk12m.js",
   "/assets/index-BKpaSXvd.css",
   "/icons/icon-48x48.png",
   "/icons/icon-72x72.png",
@@ -189,34 +189,30 @@ self.addEventListener("fetch", (event) => {
 });
 
 // Listener 'push': Menangani notifikasi masuk (VERSI DENGAN DEBUGGING)
-self.addEventListener("push", (event) => {
-  console.log("Service Worker: Push Received.");
-  console.log("--> Push event data mentah:", event.data);
+self.addEventListener('push', (event) => {
+  console.log('Service Worker: Push Received.');
 
-  let data;
+  let notificationData;
   try {
-    data = event.data.json();
+    // PERBAIKAN: Langsung parse JSON sesuai schema yang disepakati
+    notificationData = event.data.json();
   } catch (error) {
-    console.log("--> Gagal parse JSON, mencoba sebagai teks.");
-    data = {
-      title: "Notifikasi Baru",
-      body: event.data.text(),
-      url: "/",
+    console.error('Failed to parse push data as JSON:', error);
+    notificationData = {
+      title: 'Notifikasi Baru',
+      options: {
+        body: event.data.text() || 'Anda memiliki pesan baru.',
+        icon: '/icons/icon-192x192.png',
+        data: { url: '/' },
+      },
     };
   }
 
-  const options = {
-    body: data.body,
-    icon: "/images/badge.png",
-    data: {
-      url: data.url || "/",
-    },
-  };
+  // Ambil title dan options langsung dari data yang sudah diparsing
+  const { title, options } = notificationData;
 
-  console.log("--> Mencoba menampilkan notifikasi dengan judul:", data.title);
-  console.log("--> Dan dengan options:", options);
-
-  event.waitUntil(self.registration.showNotification(data.title, options));
+  console.log(`Displaying notification: "${title}"`);
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
 // Listener 'notificationclick': (Tetap sama, sudah bagus)

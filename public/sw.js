@@ -1,5 +1,5 @@
 // public/sw.js - KODE FINAL
-const CACHE_NAME = "story-app-cache-v44"; // Versi dinaikkan untuk memicu update
+const CACHE_NAME = "story-app-cache-v45"; // Versi dinaikkan untuk memicu update
 // sw.js - CONTOH UNTUK DEVELOPMENT
 const ASSETS_TO_CACHE = [
   "/", // Ini mewakili index.html di root

@@ -1,6 +1,5 @@
 import Swal from 'sweetalert2';
 
-// Fungsi ini sudah benar, tidak perlu diubah.
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -35,78 +34,74 @@ const SubscribeButton = () => {
     }
   };
 
-const subscribe = async () => {
-  try {
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: convertedVapidKey,
-    });
+  const subscribe = async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidKey,
+      });
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      Swal.fire('Gagal', 'Anda harus login untuk berlangganan notifikasi.', 'error');
-      return;
+      const token = localStorage.getItem('token');
+      if (!token) {
+        Swal.fire('Gagal', 'Anda harus login untuk berlangganan notifikasi.', 'error');
+        return;
+      }
+
+      // --- PERBAIKAN KEDUA DI SINI ---
+      // 1. Ambil hasil .toJSON() seperti sebelumnya.
+      const subscriptionJSON = subscription.toJSON();
+
+      // 2. Buat objek body baru, tapi HANYA ambil properti yang diizinkan oleh API.
+      // Ini akan membuang properti "expirationTime".
+      const body = {
+        endpoint: subscriptionJSON.endpoint,
+        keys: subscriptionJSON.keys,
+      };
+
+      const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const responseData = await response.json();
+      if (!response.ok || responseData.error) {
+        throw new Error(responseData.message || 'Gagal mengirim subscription ke server.');
+      }
+
+      Swal.fire('Berhasil!', 'Kamu berhasil berlangganan notifikasi!', 'success');
+      updateButtonUI(true);
+
+    } catch (err) {
+      console.error('Gagal subscribe:', err);
+      Swal.fire('Gagal', `Gagal melakukan subscribe. ${err.message}`, 'error');
+      updateButtonUI(false);
     }
-    const body = {
-      endpoint: subscription.endpoint,
-      keys: {
-        p256dh: subscription.getKey('p256dh')
-          ? btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh'))))
-          : null,
-        auth: subscription.getKey('auth')
-          ? btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth'))))
-          : null,
-      },
-    };
-
-    const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ endpoint: subscription.endpoint }), // Gunakan body yang baru dibuat
-    });
-
-    const responseData = await response.json();
-    if (!response.ok || responseData.error) {
-      // Jika masih gagal, lempar error agar bisa ditangkap catch block
-      throw new Error(responseData.message || 'Gagal mengirim subscription ke server.');
-    }
-
-    Swal.fire('Berhasil!', 'Kamu berhasil berlangganan notifikasi!', 'success');
-    updateButtonUI(true);
-
-  } catch (err) {
-    console.error('Gagal subscribe:', err);
-    Swal.fire('Gagal', `Gagal melakukan subscribe. ${err.message}`, 'error');
-    updateButtonUI(false);
-  }
-};
+  };
 
   const unsubscribe = async () => {
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
 
-      // --- PERBAIKAN: Seluruh logika unsubscribe ada di sini ---
       if (subscription) {
-        // 1. Ambil token di dalam scope fungsi ini
         const token = localStorage.getItem('token');
         if (!token) {
           Swal.fire('Gagal', 'Sesi Anda berakhir. Silakan login kembali.', 'error');
           return;
         }
 
-        // 2. Kirim request DELETE ke server TERLEBIH DAHULU
-        const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', { // URL yang benar
-          method: 'DELETE', // Method yang benar
+        const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
+          method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ endpoint: subscription.endpoint }), // Body yang benar
+          body: JSON.stringify({ endpoint: subscription.endpoint }),
         });
         
         const responseData = await response.json();
@@ -114,14 +109,11 @@ const subscribe = async () => {
           throw new Error(responseData.message || 'Gagal unsubscribe dari server.');
         }
 
-        // 3. Jika server berhasil, baru unsubscribe dari browser
         await subscription.unsubscribe();
 
-        console.log('Berhasil unsubscribe dari browser dan server');
         Swal.fire('Berhasil!', 'Langganan notifikasi telah dihentikan.', 'info');
         updateButtonUI(false);
       } else {
-        // Jika tidak ada subscription, cukup update UI
         Swal.fire('Info', 'Anda memang belum berlangganan.', 'info');
         updateButtonUI(false);
       }
@@ -147,7 +139,6 @@ const subscribe = async () => {
   });
 
   const checkInitialSubscription = async () => {
-    // ... (Fungsi ini sudah benar, tidak ada perubahan)
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       try {
         const registration = await navigator.serviceWorker.ready;
@@ -155,7 +146,7 @@ const subscribe = async () => {
         updateButtonUI(!!subscription);
       } catch (error) {
         console.error('Error saat memeriksa subscription awal:', error);
-        updateButtonUI(false); // Anggap tidak subscribe jika ada error
+        updateButtonUI(false);
       }
     } else {
       button.disabled = true;
@@ -167,6 +158,7 @@ const subscribe = async () => {
 
   container.appendChild(button);
   container.appendChild(statusText);
+  
   return container;
 };
 

@@ -23,9 +23,17 @@ window.addEventListener("hashchange", () => {
   Camera.stopAllStreams(); // Logika stop kamera bisa digabung di sini
 });
 
-
-
-
+if ("serviceWorker" in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('Service Worker terdaftar dengan sukses:', registration);
+      })
+      .catch((error) => {
+        console.error('Gagal mendaftarkan Service Worker:', error);
+      });
+  });
+}
 
 const token = localStorage.getItem("token");
 

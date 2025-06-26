@@ -67,7 +67,6 @@ class AddPresenter {
   }
 
   async submitForm() {
-    const name = document.querySelector("#name").value.trim();
     const description = document.querySelector("#description").value.trim();
     const lat = document.querySelector("#lat").value;
     const lon = document.querySelector("#lon").value;

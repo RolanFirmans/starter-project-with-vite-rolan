@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 
-// Fungsi ini sudah benar, tidak perlu diubah.
+
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -87,7 +87,7 @@ const SubscribeButton = () => {
   };
 
   const unsubscribe = async () => {
-    // ... (Fungsi unsubscribe tidak perlu diubah)
+    
     button.disabled = true;
     button.textContent = 'Memproses...';
     
@@ -132,7 +132,7 @@ const SubscribeButton = () => {
   };
 
   button.addEventListener('click', async () => {
-    // ... (event listener tidak perlu diubah)
+   
     const registration = await navigator.serviceWorker.ready;
     const currentSubscription = await registration.pushManager.getSubscription();
     if (currentSubscription) {
@@ -148,7 +148,7 @@ const SubscribeButton = () => {
   });
 
   const checkInitialSubscription = async () => {
-    // ... (fungsi ini tidak perlu diubah)
+
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       try {
         const registration = await navigator.serviceWorker.ready;

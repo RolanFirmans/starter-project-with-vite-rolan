@@ -1,8 +1,4 @@
 import routes from '../routes/routes';
-// Pastikan path ke url-parser benar jika Anda menggunakannya
-// import { getActiveRoute } from '../routes/url-parser'; 
-
-// Import helper function untuk VAPID key
 import urlBase64ToUint8Array from '../utils/index.js'; 
 
 class App {
@@ -16,7 +12,6 @@ class App {
     this.#navigationDrawer = navigationDrawer;
 
     this.#setupDrawer();
-    // this.#initialServiceWorker(); // <-- Kita beri komentar dulu agar tidak macet
   }
 
   #setupDrawer() {
@@ -36,7 +31,6 @@ class App {
     });
   }
 
-  // Method baru untuk registrasi SW dan Push Notification
   async #initialServiceWorker() {
     if (!('serviceWorker' in navigator && 'PushManager' in window)) {
       console.warn('Service Worker atau Push Messaging tidak didukung browser ini.');
@@ -68,10 +62,9 @@ class App {
 
       console.log('Berhasil mendapatkan subscription baru:', newSubscription);
 
-      // --- BAGIAN YANG DISESUAIKAN DENGAN DOKUMENTASI API ---
       
       // Ambil token autentikasi
-      const token = localStorage.getItem('token'); // Pastikan key 'token' sudah benar
+      const token = localStorage.getItem('token'); 
       if (!token) {
         console.error('Token autentikasi tidak ditemukan.');
         return;
@@ -79,25 +72,21 @@ class App {
 
       console.log('Mengirim subscription ke server...');
 
-      // Sesuai dokumentasi: Panggil endpoint subscribe
       const response = await fetch('/notifications/subscribe', {
-        method: 'POST', // Sesuai dokumentasi: Method POST
+        method: 'POST', 
         headers: {
-          'Content-Type': 'application/json',     // Sesuai dokumentasi: Header Content-Type
-          'Authorization': `Bearer ${token}`, // Sesuai dokumentasi: Header Authorization
+          'Content-Type': 'application/json',   
+          'Authorization': `Bearer ${token}`, 
         },
-        body: JSON.stringify(newSubscription), // Sesuai dokumentasi: Request Body berisi objek subscription
+        body: JSON.stringify(newSubscription), 
       });
       
       const responseData = await response.json();
 
-      // Sesuai dokumentasi: Cek respons dari server
       if (response.ok && !responseData.error) {
-        console.log(responseData.message); // Akan menampilkan: "Success to subscribe web push notification."
+        console.log(responseData.message); 
       } else {
-        // Jika server mengembalikan error, tampilkan pesannya
         console.error('Gagal subscribe ke server:', responseData.message);
-        // Hapus subscription yang gagal dikirim agar bisa coba lagi nanti
         await newSubscription.unsubscribe(); 
       }
       

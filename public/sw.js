@@ -1,10 +1,8 @@
-// public/sw.js - VERSI FINAL YANG LEBIH TANGGUH
-
-const CACHE_VERSION = 'v2'; // Naikkan versi untuk memicu update
+const CACHE_VERSION = 'v2'; 
 const CACHE_NAME_PREFIX = 'story-app-cache';
 const CACHE_NAME = `${CACHE_NAME_PREFIX}-${CACHE_VERSION}`;
 
-// Daftar URL App Shell yang akan di-cache saat instalasi.
+
 const APP_SHELL_URLS = [
   '/',
   '/index.html',
@@ -50,7 +48,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Strategi Network-First untuk data API
+ 
   if (url.origin === 'https://story-api.dicoding.dev' && url.pathname.startsWith('/v1/stories')) {
     event.respondWith(
       fetch(event.request)
@@ -59,12 +57,12 @@ self.addEventListener('fetch', (event) => {
           cache.then((c) => c.put(event.request, networkResponse.clone()));
           return networkResponse;
         })
-        .catch(() => caches.match(event.request)) // Fallback ke cache jika network gagal
+        .catch(() => caches.match(event.request)) 
     );
     return;
   }
 
-  // Strategi Cache-First untuk gambar, font, dan tiles (aset yang jarang berubah)
+  
   if (
     (url.origin === 'https://story-api.dicoding.dev' && url.pathname.startsWith('/images/stories/')) ||
     url.origin === 'https://fonts.gstatic.com' ||
@@ -82,8 +80,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Strategi Cache-First untuk App Shell yang sudah di-pre-cache
-  // Ini juga akan menangani semua aset lain (JS, CSS) secara dinamis
+  
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       // Jika ada di cache, langsung gunakan.
@@ -100,7 +97,7 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Listener 'push' dan 'notificationclick' tetap sama
+
 self.addEventListener('push', (event) => {
   console.log('Service Worker: Push Received.');
   const notificationData = event.data.json();

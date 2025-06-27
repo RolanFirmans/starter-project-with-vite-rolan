@@ -22,26 +22,17 @@ const HomePage = {
 
   async afterRender() {
     this.initMap();
-    await StoryPresenter.init(this); // StoryPresenter yang akan handle fetch dan render
+    await StoryPresenter.init(this); 
 
-    // --- PERBAIKAN DI SINI ---
-    // 1. Ambil komponen tombol subscribe
     const subscribeComponent = SubscribeButton();
-
-    // 2. Cari elemen utama <section> dan judul <h2> di dalamnya
     const storiesSection = document.querySelector('.stories');
     const heading = storiesSection.querySelector('h2');
 
-    // 3. Sisipkan komponen subscribe TEPAT SETELAH judul
-    // Ini memastikan posisinya stabil dan tidak terpengaruh elemen lain
     if (heading) {
       heading.after(subscribeComponent);
     } else {
-      // Sebagai cadangan jika judul tidak ditemukan, letakkan di bagian paling atas
       storiesSection.prepend(subscribeComponent);
     }
-    // --- AKHIR PERBAIKAN ---
-
     this.setupLogout();
   },
 

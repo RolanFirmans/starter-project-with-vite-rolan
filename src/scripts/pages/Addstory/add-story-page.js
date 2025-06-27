@@ -6,7 +6,7 @@ const AddPage = {
       <section>
         <h2>Tambahkan Cerita</h2>
         <form id="addStoryForm">
-         
+          
 
           <label for="description">Deskripsi:</label><br />
           <textarea id="description" name="description" required></textarea><br /><br />

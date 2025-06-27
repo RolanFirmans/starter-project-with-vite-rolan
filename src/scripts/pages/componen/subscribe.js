@@ -1,5 +1,6 @@
 import Swal from 'sweetalert2';
 
+// Fungsi ini sudah benar, tidak perlu diubah.
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -11,12 +12,16 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
+
 const SubscribeButton = () => {
   const container = document.createElement('div');
   const button = document.createElement('button');
   const statusText = document.createElement('p');
 
   button.id = 'subscribeButton';
+  button.textContent = 'Subscribe Notifikasi'; 
+  statusText.textContent = 'Kamu belum berlangganan.';
+  
   button.style.marginTop = '16px';
   statusText.style.fontSize = '0.9rem';
   statusText.style.marginTop = '8px';
@@ -25,6 +30,7 @@ const SubscribeButton = () => {
   const convertedVapidKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
 
   const updateButtonUI = (isSubscribed) => {
+    button.disabled = false;
     if (isSubscribed) {
       button.textContent = 'Unsubscribe Notifikasi';
       statusText.textContent = 'Kamu sudah berlangganan notifikasi.';
@@ -35,6 +41,9 @@ const SubscribeButton = () => {
   };
 
   const subscribe = async () => {
+    button.disabled = true;
+    button.textContent = 'Memproses...';
+    
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.subscribe({
@@ -42,30 +51,24 @@ const SubscribeButton = () => {
         applicationServerKey: convertedVapidKey,
       });
 
+      // Mengubah subscription menjadi objek biasa & menghapus properti yang tidak diizinkan
+      const subscriptionObject = subscription.toJSON();
+      delete subscriptionObject.expirationTime;
+
       const token = localStorage.getItem('token');
       if (!token) {
         Swal.fire('Gagal', 'Anda harus login untuk berlangganan notifikasi.', 'error');
+        updateButtonUI(false);
         return;
       }
-
-      // --- PERBAIKAN KEDUA DI SINI ---
-      // 1. Ambil hasil .toJSON() seperti sebelumnya.
-      const subscriptionJSON = subscription.toJSON();
-
-      // 2. Buat objek body baru, tapi HANYA ambil properti yang diizinkan oleh API.
-      // Ini akan membuang properti "expirationTime".
-      const body = {
-        endpoint: subscriptionJSON.endpoint,
-        keys: subscriptionJSON.keys,
-      };
-
+      
       const response = await fetch('https://story-api.dicoding.dev/v1/notifications/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(subscriptionObject),
       });
 
       const responseData = await response.json();
@@ -84,6 +87,10 @@ const SubscribeButton = () => {
   };
 
   const unsubscribe = async () => {
+    // ... (Fungsi unsubscribe tidak perlu diubah)
+    button.disabled = true;
+    button.textContent = 'Memproses...';
+    
     try {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
@@ -92,6 +99,7 @@ const SubscribeButton = () => {
         const token = localStorage.getItem('token');
         if (!token) {
           Swal.fire('Gagal', 'Sesi Anda berakhir. Silakan login kembali.', 'error');
+          updateButtonUI(true);
           return;
         }
 
@@ -110,7 +118,6 @@ const SubscribeButton = () => {
         }
 
         await subscription.unsubscribe();
-
         Swal.fire('Berhasil!', 'Langganan notifikasi telah dihentikan.', 'info');
         updateButtonUI(false);
       } else {
@@ -120,10 +127,12 @@ const SubscribeButton = () => {
     } catch (err) {
       console.error('Gagal unsubscribe:', err);
       Swal.fire('Gagal', `Gagal melakukan unsubscribe. ${err.message}`, 'error');
+      updateButtonUI(true);
     }
   };
 
   button.addEventListener('click', async () => {
+    // ... (event listener tidak perlu diubah)
     const registration = await navigator.serviceWorker.ready;
     const currentSubscription = await registration.pushManager.getSubscription();
     if (currentSubscription) {
@@ -139,6 +148,7 @@ const SubscribeButton = () => {
   });
 
   const checkInitialSubscription = async () => {
+    // ... (fungsi ini tidak perlu diubah)
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       try {
         const registration = await navigator.serviceWorker.ready;
@@ -146,7 +156,6 @@ const SubscribeButton = () => {
         updateButtonUI(!!subscription);
       } catch (error) {
         console.error('Error saat memeriksa subscription awal:', error);
-        updateButtonUI(false);
       }
     } else {
       button.disabled = true;
@@ -158,7 +167,6 @@ const SubscribeButton = () => {
 
   container.appendChild(button);
   container.appendChild(statusText);
-  
   return container;
 };
 

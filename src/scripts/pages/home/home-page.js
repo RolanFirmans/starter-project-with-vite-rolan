@@ -1,6 +1,8 @@
-import SubscribeButton from "../componen/subscribe.js";
+import SubscribeButton from "../componen/subscribe";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import Swal from "sweetalert2"; 
+import StoriesDb from "../../data/db-helper.js";
 import StoryPresenter from '../../pages/home/story-presenter.js';
 
 const HomePage = {
@@ -14,31 +16,33 @@ const HomePage = {
         <div id="story-list" class="story-list"></div>
         <div id="map" style="height: 400px; margin-top: 16px;"></div>
         <button id="logoutButton" style="margin-top: 16px;">Logout</button>
-        
-        <div id="subscribe-container"></div> 
-
       </section>
     `;
   },
 
   async afterRender() {
     this.initMap();
+    await StoryPresenter.init(this); // StoryPresenter yang akan handle fetch dan render
 
-    // === PERBAIKAN 3: Melindungi proses pengambilan data ===
-    try {
-      await StoryPresenter.init(this); // StoryPresenter yang akan handle fetch dan render
-    } catch (error) {
-      console.error("Gagal menginisialisasi stories (mungkin karena belum login), tapi aplikasi tetap lanjut:", error);
-      // Anda bisa menampilkan pesan error di UI jika mau
-      this.showError("Gagal memuat cerita. Silakan login terlebih dahulu.");
+    // --- PERBAIKAN DI SINI ---
+    // 1. Ambil komponen tombol subscribe
+    const subscribeComponent = SubscribeButton();
+
+    // 2. Cari elemen utama <section> dan judul <h2> di dalamnya
+    const storiesSection = document.querySelector('.stories');
+    const heading = storiesSection.querySelector('h2');
+
+    // 3. Sisipkan komponen subscribe TEPAT SETELAH judul
+    // Ini memastikan posisinya stabil dan tidak terpengaruh elemen lain
+    if (heading) {
+      heading.after(subscribeComponent);
+    } else {
+      // Sebagai cadangan jika judul tidak ditemukan, letakkan di bagian paling atas
+      storiesSection.prepend(subscribeComponent);
     }
-    
-    // === PERBAIKAN 2: Menggunakan querySelector dan memperbaiki typo ===
-    const subscribeContainer = document.querySelector('#subscribe-container');
-    if (subscribeContainer) {
-      const subscribeButtonComponent = SubscribeButton();
-      subscribeContainer.appendChild(subscribeButtonComponent);
-    }
+    // --- AKHIR PERBAIKAN ---
+
+    this.setupLogout();
   },
 
   initMap() {
@@ -55,55 +59,65 @@ const HomePage = {
   renderStories(stories) {
     const container = document.querySelector("#story-list");
     if (!stories || stories.length === 0) {
-      // Jika tidak ada cerita (mungkin karena belum login), jangan tampilkan apa-apa atau beri pesan
-      if (!localStorage.getItem('token')) return; // Jangan tampilkan "Belum ada cerita" jika belum login
       container.innerHTML = "<p>Belum ada cerita. Tambahkan ceritamu!</p>";
       return;
     }
 
     container.innerHTML = stories
-      .map((story) => {
-          const imageUrl = story.photoUrl || "https://via.placeholder.com/300"; // Fallback image
+      .map((story, index) => {
+        try {
+          const imageUrl = story.photoUrl
+            ? story.photoUrl
+            : URL.createObjectURL(story.photo);
+
           const storyDate = new Date(story.createdAt).toLocaleString("id-ID", {
             dateStyle: "medium",
             timeStyle: "short",
           });
+
           return `
             <div class="story-card" data-id="${story.id}">
-              <img src="${imageUrl}" alt="${story.name || "Story Image"}" style="width:100%; object-fit: cover;" />
+              <img src="${imageUrl}" alt="${
+                story.name || "Story Image"
+              }" style="width:100%; object-fit: cover;" />
+              <h3>${story.name || "Tanpa Nama"}</h3>
               <p>${story.description}</p>
               <small>${storyDate}</small>
               <button class="save-button" aria-label="Simpan cerita ${story.name}" data-id="${story.id}">Simpan</button>
             </div>
           `;
+        } catch (err) {
+          console.error(`Gagal merender cerita di index ${index}:`, story);
+          console.error("Error yang terjadi adalah:", err);
+          return `<div class="story-card-error">Gagal memuat cerita ini. Periksa console untuk detail.</div>`;
+        }
       })
       .join("");
   },
 
   addStoryMarkersToMap(stories) {
-    if (!stories) return;
     stories.forEach((story) => {
       if (story.lat && story.lon) {
         const marker = L.marker([story.lat, story.lon]).addTo(this.map);
-        marker.bindPopup(`<strong>${story.name || "Tanpa Nama"}</strong><br>${story.description}`);
+        marker.bindPopup(
+          `<strong>${story.name || "Tanpa Nama"}</strong><br>${
+            story.description
+          }`
+        );
       }
     });
   },
-
+  
   showError(message) {
     const container = document.querySelector("#story-list");
-    container.innerHTML = `<p style="color:red; text-align:center;">${message}</p>`;
+    container.innerHTML = `<p style="color:red;">${message}</p>`;
   },
 
   setupLogout() {
-    const logoutButton = document.querySelector("#logoutButton");
-    if (logoutButton) {
-      logoutButton.addEventListener("click", () => {
-        localStorage.removeItem("token");
-        window.location.hash = "/login";
-        window.location.reload();
-      });
-    }
+    document.querySelector("#logoutButton").addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.hash = "/login";
+    });
   },
 };
 

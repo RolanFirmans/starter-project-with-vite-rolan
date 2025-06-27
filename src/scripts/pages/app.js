@@ -16,7 +16,7 @@ class App {
     this.#navigationDrawer = navigationDrawer;
 
     this.#setupDrawer();
-    this.#initialServiceWorker(); // Panggil method untuk inisialisasi tombol unsubscribe
+    // this.#initialServiceWorker(); // <-- Kita beri komentar dulu agar tidak macet
   }
 
   #setupDrawer() {

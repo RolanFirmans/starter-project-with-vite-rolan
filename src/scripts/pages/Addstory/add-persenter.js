@@ -67,6 +67,7 @@ class AddPresenter {
   }
 
   async submitForm() {
+    // Baris untuk mengambil nilai nama dihapus
     const description = document.querySelector("#description").value.trim();
     const lat = document.querySelector("#lat").value;
     const lon = document.querySelector("#lon").value;
@@ -78,7 +79,7 @@ class AddPresenter {
 
     const storyData = {
       id: `story-${Date.now()}`,
-      name,
+      // Properti 'name' dihapus dari objek ini
       description,
       photo: this.capturedBlob,
       lat,

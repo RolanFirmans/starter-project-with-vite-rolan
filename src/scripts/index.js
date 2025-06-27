@@ -4,6 +4,27 @@ import "../styles/styles.css";
 import App from "./pages/app";
 import Camera from "./utils/camera.js";
 
+
+// --- KODE PENDAFTARAN SERVICE WORKER ---
+// Cek apakah browser mendukung Service Worker
+if ('serviceWorker' in navigator) {
+  // Gunakan event 'load' untuk memastikan pendaftaran tidak mengganggu loading halaman utama
+  window.addEventListener('load', () => {
+    // Daftarkan file sw.js yang ada di root folder
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('Pendaftaran Service Worker BERHASIL. Scope:', registration.scope);
+      })
+      .catch(error => {
+        console.error('Pendaftaran Service Worker GAGAL:', error);
+      });
+  });
+} else {
+  console.log('Browser ini tidak mendukung Service Worker.');
+}
+// --- AKHIR KODE PENDAFTARAN ---
+
+
 // Inisialisasi Aplikasi (sudah benar)
 const app = new App({
   navigationDrawer: document.querySelector("#navigation-drawer"),
@@ -22,20 +43,6 @@ window.addEventListener("hashchange", () => {
   app.renderPage();
   Camera.stopAllStreams(); // Logika stop kamera bisa digabung di sini
 });
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((registration) => {
-        console.log('Service Worker terdaftar dengan sukses:', registration);
-      })
-      .catch((error) => {
-        console.error('Gagal mendaftarkan Service Worker:', error);
-      });
-  });
-}
-
-const token = localStorage.getItem("token");
 
 // Kirim ulang data register yang tertunda ketika online
 window.addEventListener("online", () => {
